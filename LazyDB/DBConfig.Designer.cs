@@ -39,6 +39,10 @@
             this.DbIP_TBox = new System.Windows.Forms.TextBox();
             this.Save_Btn = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.label1 = new System.Windows.Forms.Label();
+            this.appidBox = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.codeBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // lbDBPwd
@@ -57,7 +61,6 @@
             this.DbPwd_TBox.PasswordChar = '*';
             this.DbPwd_TBox.Size = new System.Drawing.Size(200, 21);
             this.DbPwd_TBox.TabIndex = 28;
-            this.DbPwd_TBox.Text = "";
             this.toolTip1.SetToolTip(this.DbPwd_TBox, "数据库密码");
             // 
             // lbDBUser
@@ -93,7 +96,6 @@
             this.DbName_TBox.Name = "DbName_TBox";
             this.DbName_TBox.Size = new System.Drawing.Size(200, 21);
             this.DbName_TBox.TabIndex = 24;
-            this.DbName_TBox.Text = "";
             this.toolTip1.SetToolTip(this.DbName_TBox, "要连接的数据库名称");
             // 
             // lbDBSource
@@ -111,7 +113,6 @@
             this.DbIP_TBox.Name = "DbIP_TBox";
             this.DbIP_TBox.Size = new System.Drawing.Size(200, 21);
             this.DbIP_TBox.TabIndex = 22;
-            this.DbIP_TBox.Text = "";
             this.toolTip1.SetToolTip(this.DbIP_TBox, "要连接的数据库IP地址，如为本地数据库则填.");
             // 
             // Save_Btn
@@ -124,12 +125,50 @@
             this.Save_Btn.UseVisualStyleBackColor = true;
             this.Save_Btn.Click += new System.EventHandler(this.Save_Btn_Click);
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 131);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(47, 12);
+            this.label1.TabIndex = 36;
+            this.label1.Text = "appid：";
+            // 
+            // appidBox
+            // 
+            this.appidBox.Location = new System.Drawing.Point(95, 128);
+            this.appidBox.Name = "appidBox";
+            this.appidBox.Size = new System.Drawing.Size(200, 21);
+            this.appidBox.TabIndex = 35;
+            this.toolTip1.SetToolTip(this.appidBox, "要连接的数据库名称");
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(12, 167);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(41, 12);
+            this.label2.TabIndex = 38;
+            this.label2.Text = "code：";
+            // 
+            // codeBox
+            // 
+            this.codeBox.Location = new System.Drawing.Point(95, 164);
+            this.codeBox.Name = "codeBox";
+            this.codeBox.Size = new System.Drawing.Size(200, 21);
+            this.codeBox.TabIndex = 37;
+            this.toolTip1.SetToolTip(this.codeBox, "要连接的数据库名称");
+            // 
             // DBConfig
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ClientSize = new System.Drawing.Size(303, 277);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.codeBox);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.appidBox);
             this.Controls.Add(this.Save_Btn);
             this.Controls.Add(this.lbDBPwd);
             this.Controls.Add(this.DbPwd_TBox);
@@ -162,5 +201,9 @@
         private System.Windows.Forms.TextBox DbIP_TBox;
         private System.Windows.Forms.Button Save_Btn;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox appidBox;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox codeBox;
     }
 }

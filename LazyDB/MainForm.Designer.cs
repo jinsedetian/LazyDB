@@ -39,6 +39,7 @@ namespace LazyDB
             this.ChsTextBox = new System.Windows.Forms.TextBox();
             this.OkButton = new System.Windows.Forms.Button();
             this.ExportButton = new System.Windows.Forms.Button();
+            this.autoAllButton = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -110,7 +111,7 @@ namespace LazyDB
             // 
             // OkButton
             // 
-            this.OkButton.Location = new System.Drawing.Point(146, 162);
+            this.OkButton.Location = new System.Drawing.Point(146, 144);
             this.OkButton.Name = "OkButton";
             this.OkButton.Size = new System.Drawing.Size(75, 23);
             this.OkButton.TabIndex = 5;
@@ -120,7 +121,7 @@ namespace LazyDB
             // 
             // ExportButton
             // 
-            this.ExportButton.Location = new System.Drawing.Point(247, 198);
+            this.ExportButton.Location = new System.Drawing.Point(146, 209);
             this.ExportButton.Name = "ExportButton";
             this.ExportButton.Size = new System.Drawing.Size(75, 23);
             this.ExportButton.TabIndex = 6;
@@ -128,11 +129,22 @@ namespace LazyDB
             this.ExportButton.UseVisualStyleBackColor = true;
             this.ExportButton.Click += new System.EventHandler(this.ExportButton_Click);
             // 
+            // autoAllButton
+            // 
+            this.autoAllButton.Location = new System.Drawing.Point(146, 175);
+            this.autoAllButton.Name = "autoAllButton";
+            this.autoAllButton.Size = new System.Drawing.Size(75, 23);
+            this.autoAllButton.TabIndex = 7;
+            this.autoAllButton.Text = "自动翻译";
+            this.autoAllButton.UseVisualStyleBackColor = true;
+            this.autoAllButton.Click += new System.EventHandler(this.autoAllButton_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(414, 251);
+            this.Controls.Add(this.autoAllButton);
             this.Controls.Add(this.ExportButton);
             this.Controls.Add(this.OkButton);
             this.Controls.Add(this.ChsTextBox);
@@ -140,8 +152,10 @@ namespace LazyDB
             this.Controls.Add(this.ChsLabel);
             this.Controls.Add(this.EngLabel);
             this.Controls.Add(this.menuStrip1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "MainForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
             this.menuStrip1.ResumeLayout(false);
@@ -163,5 +177,6 @@ namespace LazyDB
         private System.Windows.Forms.TextBox ChsTextBox;
         private System.Windows.Forms.Button OkButton;
         private System.Windows.Forms.Button ExportButton;
+        private System.Windows.Forms.Button autoAllButton;
     }
 }

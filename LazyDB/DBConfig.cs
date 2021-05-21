@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
@@ -12,9 +13,20 @@ namespace LazyDB
 {
     public partial class DBConfig : Form
     {
+        private SystemConfigModel Config = new SystemConfigModel();
         public DBConfig()
         {
             InitializeComponent();
+        }
+
+        public DBConfig(SystemConfigModel config)
+        {
+            InitializeComponent();
+            Config = config;
+            DbIP_TBox.Text = Config.ip;
+            DbName_TBox.Text = Config.dbName;
+            DbUserName_TBox.Text = Config.userName;
+            DbPwd_TBox.Text = Config.password;
         }
 
         #region 窗体操作
@@ -24,27 +36,15 @@ namespace LazyDB
             DbIP_TBox.ReadOnly = false;
         }
 
-        private void DbName_PBox_Click(object sender, EventArgs e)
-        {
-            DbName_TBox.Enabled = true;
-            DbName_TBox.ReadOnly = false;
-        }
-
-        private void DbUserName_PBox_Click(object sender, EventArgs e)
-        {
-            DbUserName_TBox.Enabled = true;
-            DbUserName_TBox.ReadOnly = false;
-        }
-
-        private void DbPwd_PBox_Click(object sender, EventArgs e)
-        {
-            DbPwd_TBox.Enabled = true;
-            DbPwd_TBox.ReadOnly = false;
-        }
-
         private void Save_Btn_Click(object sender, EventArgs e)
         {
-            if (WriteAppConfig())
+            Config.ip = DbIP_TBox.Text;
+            Config.dbName = DbName_TBox.Text;
+            Config.userName = DbUserName_TBox.Text;
+            Config.password = DbPwd_TBox.Text;
+            Config.appId = appidBox.Text;
+            Config.code = codeBox.Text;
+            if (JsonHelper.WriteFile(JsonConvert.SerializeObject(Config, Formatting.Indented)))
             {
                 MessageBox.Show("保存成功");
                 Close();
@@ -63,10 +63,12 @@ namespace LazyDB
         #region 保存配置
         private void LoadAppConfig()
         {
-            DbIP_TBox.Text = ConfigurationManager.AppSettings["DbIP"];
-            DbName_TBox.Text = ConfigurationManager.AppSettings["DbName"];
-            DbUserName_TBox.Text = ConfigurationManager.AppSettings["DbUserName"];
-            DbPwd_TBox.Text = ConfigurationManager.AppSettings["DbPwd"];
+            DbIP_TBox.Text = Config.ip;
+            DbName_TBox.Text = Config.dbName;
+            DbUserName_TBox.Text = Config.userName;
+            DbPwd_TBox.Text = Config.password;
+            appidBox.Text = Config.appId;
+            codeBox.Text = Config.code;
         }
         private bool WriteAppConfig()
         {
@@ -89,7 +91,7 @@ namespace LazyDB
                 config.Save(ConfigurationSaveMode.Modified);
                 ConfigurationManager.RefreshSection("appSettings");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 b = false;
             }
@@ -99,6 +101,7 @@ namespace LazyDB
 
         private void DBConfig_Load(object sender, EventArgs e)
         {
+            Config = JsonHelper.ReadConfigJson();
             LoadAppConfig();
         }
     }

@@ -9,32 +9,38 @@ using System.Data.SqlClient;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 using System.Windows.Forms;
 
 namespace LazyDB
 {
     public partial class MainForm : Form
     {
+        private SystemConfigModel config;
         public MainForm()
         {
             InitializeComponent();
+            config = JsonHelper.ReadConfigJson();
         }
 
         private string connsql
         {
             get
             {
-                return $"Data Source={ConfigurationManager.AppSettings["DbIP"]};Initial Catalog={ConfigurationManager.AppSettings["DbName"]};Persist Security Info=True;User ID={ConfigurationManager.AppSettings["DbUserName"]};Password={ConfigurationManager.AppSettings["DbPwd"]}";
+                return $"Data Source={config.ip};Initial Catalog={config.dbName};Persist Security Info=True;User ID={config.userName};Password={config.password};";
             }
         }
 
         private void DBSetToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var config = SingletonHelper<DBConfig>.CreateInstance(null);
-            config.ShowDialog();
+            var dbConfig = SingletonHelper<DBConfig>.CreateInstance();
+            dbConfig.ShowDialog();
+            config = JsonHelper.ReadConfigJson();
         }
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -239,6 +245,158 @@ SELECT
             {
                 return model;
             }
+        }
+
+        private void autoAllButton_Click(object sender, EventArgs e)
+        {
+            var appid = config.appId;
+            var code = config.code;
+            var salt = new Random().Next(10000000, 99999999);
+            try
+            {
+                List<string> list = new List<string>();
+                using (SqlConnection conn = new SqlConnection())
+                {
+                    conn.ConnectionString = connsql;
+                    conn.Open(); // 打开数据库连接
+                    string sql = @"SELECT Distinct A.[name]
+FROM syscolumns A
+inner join 
+ sysobjects D
+ On A.id=D.id  and D.xtype='U' and  D.name<>'dtproperties'
+Left Join
+ sys.extended_properties  G
+ on
+     A.id=G.major_id and A.colid=G.minor_id
+where G.[value] is null
+order by A.[name]"; // 查询语句
+
+                    SqlCommand myda = new SqlCommand(sql, conn);
+                    var reader = myda.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        list.Add(reader[0].ToString());
+                    }
+                }
+                var count = 0;
+                foreach (var q in list)
+                {
+                    var str = $"{appid}{q}{salt}{code}";
+                    var sb = new StringBuilder();
+                    using (var md5 = MD5.Create())
+                    {
+                        var encoding = Encoding.UTF8;
+                        var buff = md5.ComputeHash(encoding.GetBytes(str));
+                        md5.Clear();//释放资源，清除内存
+                        foreach (var t in buff)
+                        {
+                            sb.AppendFormat("{0:x2}", t);
+                        }
+                    }
+                    var sign = sb.ToString();
+                    var url = $"http://api.fanyi.baidu.com/api/trans/vip/translate?q={q}&from=auto&to=zh&appid={appid}&salt={salt}&sign={sign}";
+                    var resultStr = Get(url);
+                    var data = new JavaScriptSerializer().Deserialize<model>(resultStr);
+                    if (data != null && data.trans_result.Count > 0)
+                    {
+                        try
+                        {
+                            StringBuilder sqlBuilder = new StringBuilder();
+                            using (SqlConnection conn = new SqlConnection())
+                            {
+                                conn.ConnectionString = connsql;
+                                conn.Open(); // 打开数据库连接
+                                string sql = @"SELECT ('EXECUTE '+Case when G.[value] is null then'sp_addextendedproperty'else 'sp_updateextendedproperty' end +' N''MS_Description'', N''' + @Chs + ''', N''user'', N''dbo'', N''table'', N''' + D.name + ''', N''column'', N''' + @Eng  +'''') as text 
+FROM syscolumns A
+inner join 
+ sysobjects D
+ On A.id=D.id  and D.xtype='U' and  D.name<>'dtproperties'
+Left Join
+ sys.extended_properties  G
+ on
+     A.id=G.major_id and A.colid=G.minor_id
+where 
+--D.xtype='U' and  D.name<>'dtproperties' and
+A.[name]=@Eng
+order by D.name"; // 查询语句
+
+                                SqlCommand myda = new SqlCommand(sql, conn);
+                                myda.Parameters.Add(new SqlParameter("@Eng", SqlDbType.NVarChar, 100));
+                                myda.Parameters.Add(new SqlParameter("@Chs", SqlDbType.NVarChar, 100));
+                                myda.Parameters["@Eng"].Value = q;
+                                myda.Parameters["@Chs"].Value = data.trans_result[0].dst;
+                                var reader = myda.ExecuteReader();
+                                while (reader.Read())
+                                {
+                                    count++;
+                                    sqlBuilder.Append(reader[0].ToString() + "\r");
+                                }
+                            }
+                            using (SqlConnection conn = new SqlConnection())
+                            {
+                                conn.ConnectionString = connsql;
+                                conn.Open(); // 打开数据库连接
+                                SqlCommand sqlcmd = new SqlCommand(sqlBuilder.ToString(), conn);//创建 Command 对象
+                                sqlcmd.CommandText = sqlBuilder.ToString();
+                                sqlcmd.Parameters.Add(new SqlParameter("@Eng", SqlDbType.NVarChar, 100));
+                                sqlcmd.Parameters.Add(new SqlParameter("@Chs", SqlDbType.NVarChar, 100));
+                                sqlcmd.Parameters["@Eng"].Value = q;
+                                sqlcmd.Parameters["@Chs"].Value = data.trans_result[0].dst;
+                                var result = sqlcmd.ExecuteNonQuery();
+                                conn.Close(); //关闭数据库连接
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("错误信息：" + ex.Message, "出现错误");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("错误信息：" + ex.Message, "出现错误");
+            }
+        }
+
+        public class model
+        {
+            public string from { get; set; }
+            public string to { get; set; }
+            public List<trans_result> trans_result { get; set; }
+        }
+
+        public class trans_result
+        {
+            public string src { get; set; }
+            public string dst { get; set; }
+        }
+
+        /// <summary>
+        /// HTTPget请求
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public static string Get(string url)
+        {
+            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
+            request.KeepAlive = false;
+            request.ProtocolVersion = HttpVersion.Version10;
+            request.Timeout = 5000;
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            Stream s;
+            string StrDate = "";
+            string strValue = "";
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                s = response.GetResponseStream();
+                StreamReader Reader = new StreamReader(s, Encoding.UTF8);
+                while ((StrDate = Reader.ReadLine()) != null)
+                {
+                    strValue += StrDate;
+                }
+            }
+            return strValue;
         }
     }
 }
