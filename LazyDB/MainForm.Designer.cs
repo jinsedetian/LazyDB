@@ -32,7 +32,6 @@ namespace LazyDB
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.基本设置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.DBSetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.百度翻译ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.EngLabel = new System.Windows.Forms.Label();
             this.ChsLabel = new System.Windows.Forms.Label();
             this.EngTextBox = new System.Windows.Forms.TextBox();
@@ -56,8 +55,7 @@ namespace LazyDB
             // 基本设置ToolStripMenuItem
             // 
             this.基本设置ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.DBSetToolStripMenuItem,
-            this.百度翻译ToolStripMenuItem});
+            this.DBSetToolStripMenuItem});
             this.基本设置ToolStripMenuItem.Name = "基本设置ToolStripMenuItem";
             this.基本设置ToolStripMenuItem.Size = new System.Drawing.Size(68, 21);
             this.基本设置ToolStripMenuItem.Text = "基本设置";
@@ -65,15 +63,9 @@ namespace LazyDB
             // DBSetToolStripMenuItem
             // 
             this.DBSetToolStripMenuItem.Name = "DBSetToolStripMenuItem";
-            this.DBSetToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
+            this.DBSetToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.DBSetToolStripMenuItem.Text = "数据库配置";
             this.DBSetToolStripMenuItem.Click += new System.EventHandler(this.DBSetToolStripMenuItem_Click);
-            // 
-            // 百度翻译ToolStripMenuItem
-            // 
-            this.百度翻译ToolStripMenuItem.Name = "百度翻译ToolStripMenuItem";
-            this.百度翻译ToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
-            this.百度翻译ToolStripMenuItem.Text = "百度翻译";
             // 
             // EngLabel
             // 
@@ -170,7 +162,6 @@ namespace LazyDB
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem 基本设置ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem DBSetToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 百度翻译ToolStripMenuItem;
         private System.Windows.Forms.Label EngLabel;
         private System.Windows.Forms.Label ChsLabel;
         private System.Windows.Forms.TextBox EngTextBox;
