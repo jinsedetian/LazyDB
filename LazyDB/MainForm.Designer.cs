@@ -39,6 +39,7 @@ namespace LazyDB
             this.OkButton = new System.Windows.Forms.Button();
             this.ExportButton = new System.Windows.Forms.Button();
             this.autoAllButton = new System.Windows.Forms.Button();
+            this.导出配置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -55,7 +56,8 @@ namespace LazyDB
             // 基本设置ToolStripMenuItem
             // 
             this.基本设置ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.DBSetToolStripMenuItem});
+            this.DBSetToolStripMenuItem,
+            this.导出配置ToolStripMenuItem});
             this.基本设置ToolStripMenuItem.Name = "基本设置ToolStripMenuItem";
             this.基本设置ToolStripMenuItem.Size = new System.Drawing.Size(68, 21);
             this.基本设置ToolStripMenuItem.Text = "基本设置";
@@ -131,6 +133,13 @@ namespace LazyDB
             this.autoAllButton.UseVisualStyleBackColor = true;
             this.autoAllButton.Click += new System.EventHandler(this.autoAllButton_Click);
             // 
+            // 导出配置ToolStripMenuItem
+            // 
+            this.导出配置ToolStripMenuItem.Name = "导出配置ToolStripMenuItem";
+            this.导出配置ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.导出配置ToolStripMenuItem.Text = "导出配置";
+            this.导出配置ToolStripMenuItem.Click += new System.EventHandler(this.导出配置ToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -169,5 +178,6 @@ namespace LazyDB
         private System.Windows.Forms.Button OkButton;
         private System.Windows.Forms.Button ExportButton;
         private System.Windows.Forms.Button autoAllButton;
+        private System.Windows.Forms.ToolStripMenuItem 导出配置ToolStripMenuItem;
     }
 }

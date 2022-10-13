@@ -20,5 +20,29 @@ namespace LazyDB
         /// 密钥
         /// </summary>
         public string code { get; set; }
+        /// <summary>
+        /// 序号
+        /// </summary>
+        public bool Number { get; set; }
+        /// <summary>
+        /// 字段英文名
+        /// </summary>
+        public string EngName { get; set; }
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public bool Type { get; set; }
+        /// <summary>
+        /// 字段中文名
+        /// </summary>
+        public bool ChsName { get; set; }
+        /// <summary>
+        /// 必填
+        /// </summary>
+        public bool Required { get; set; }
+        /// <summary>
+        /// 默认值
+        /// </summary>
+        public bool DefaultValue { get; set; }
     }
 }

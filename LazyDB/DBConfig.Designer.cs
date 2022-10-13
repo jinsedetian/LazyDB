@@ -39,10 +39,10 @@
             this.DbIP_TBox = new System.Windows.Forms.TextBox();
             this.Save_Btn = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.label1 = new System.Windows.Forms.Label();
             this.appidBox = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
             this.codeBox = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // lbDBPwd
@@ -125,6 +125,22 @@
             this.Save_Btn.UseVisualStyleBackColor = true;
             this.Save_Btn.Click += new System.EventHandler(this.Save_Btn_Click);
             // 
+            // appidBox
+            // 
+            this.appidBox.Location = new System.Drawing.Point(95, 128);
+            this.appidBox.Name = "appidBox";
+            this.appidBox.Size = new System.Drawing.Size(200, 21);
+            this.appidBox.TabIndex = 35;
+            this.toolTip1.SetToolTip(this.appidBox, "要连接的数据库名称");
+            // 
+            // codeBox
+            // 
+            this.codeBox.Location = new System.Drawing.Point(95, 164);
+            this.codeBox.Name = "codeBox";
+            this.codeBox.Size = new System.Drawing.Size(200, 21);
+            this.codeBox.TabIndex = 37;
+            this.toolTip1.SetToolTip(this.codeBox, "要连接的数据库名称");
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -134,14 +150,6 @@
             this.label1.TabIndex = 36;
             this.label1.Text = "appid：";
             // 
-            // appidBox
-            // 
-            this.appidBox.Location = new System.Drawing.Point(95, 128);
-            this.appidBox.Name = "appidBox";
-            this.appidBox.Size = new System.Drawing.Size(200, 21);
-            this.appidBox.TabIndex = 35;
-            this.toolTip1.SetToolTip(this.appidBox, "要连接的数据库名称");
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -150,14 +158,6 @@
             this.label2.Size = new System.Drawing.Size(41, 12);
             this.label2.TabIndex = 38;
             this.label2.Text = "code：";
-            // 
-            // codeBox
-            // 
-            this.codeBox.Location = new System.Drawing.Point(95, 164);
-            this.codeBox.Name = "codeBox";
-            this.codeBox.Size = new System.Drawing.Size(200, 21);
-            this.codeBox.TabIndex = 37;
-            this.toolTip1.SetToolTip(this.codeBox, "要连接的数据库名称");
             // 
             // DBConfig
             // 

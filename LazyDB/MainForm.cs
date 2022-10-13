@@ -39,7 +39,7 @@ namespace LazyDB
         private void DBSetToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var dbConfig = SingletonHelper<DBConfig>.CreateInstance();
-            dbConfig.ShowDialog();
+            dbConfig.Show();
             config = JsonHelper.ReadConfigJson();
         }
 
@@ -105,9 +105,12 @@ order by D.name"; // 查询语句
             }
         }
 
+        private delegate void Export(int a, XWPFTable Table, List<TableStruct> temp);
+        private event Export ExportList;
+        private event Export TitleList;
+
         private void ExportButton_Click(object sender, EventArgs e)
         {
-
             try
             {
                 using (SaveFileDialog saveFileDialog1 = new SaveFileDialog())
@@ -138,7 +141,7 @@ SELECT
 	 主键       = Case When exists(SELECT 1 FROM sysobjects Where xtype='PK' and parent_obj=A.id and name in (
                       SELECT name FROM sysindexes WHERE indid in( SELECT indid FROM sysindexkeys WHERE id = A.id AND colid=A.colid))) then 1 else 0 end,
      占用字节数 = A.Length,
-     长度       = COLUMNPROPERTY(A.id,A.name,'PRECISION'),
+     Length       = COLUMNPROPERTY(A.id,A.name,'PRECISION'),
      小数位数   = isnull(COLUMNPROPERTY(A.id,A.name,'Scale'),0),
      IsNullAble     = Case When A.isnullable=1 Then 1 Else 0 End,
      DefaultValue     = isnull(E.Text,'')
@@ -178,6 +181,79 @@ SELECT
                         var output = data.GroupBy(w => w.FormName).ToList();
                         XWPFDocument doc = new XWPFDocument();
                         var properties = typeof(TableStruct).GetProperties().Where(w => w.GetCustomAttribute<DisplayNameAttribute>() != null).ToList();
+                        var titleSum = 0;
+                        if (config.Number)
+                        {
+                            var tempNum = titleSum++;
+                            TitleList += (int a, XWPFTable Table, List<TableStruct> temp) =>
+                            {
+                                Table.Rows[0].GetCell(tempNum).SetText("序号");
+                            };
+                            ExportList += (int a, XWPFTable Table, List<TableStruct> temp) =>
+                            {
+                                Table.Rows[a + 1].GetCell(tempNum).SetText(temp[a].Number.ToString());
+                            };
+                        }
+                        if (config.EngName == "Normal")
+                        {
+                            var tempNum = titleSum++;
+                            TitleList += (int a, XWPFTable Table, List<TableStruct> temp) =>
+                            {
+                                Table.Rows[0].GetCell(tempNum).SetText("字段英文名");
+                            };
+                            ExportList += (int a, XWPFTable Table, List<TableStruct> temp) =>
+                            {
+                                Table.Rows[a + 1].GetCell(tempNum).SetText(temp[a].ColName);
+                            };
+                        }
+                        if (config.Type)
+                        {
+                            var tempNum = titleSum++;
+                            TitleList += (int a, XWPFTable Table, List<TableStruct> temp) =>
+                            {
+                                Table.Rows[0].GetCell(tempNum).SetText("类型");
+                            };
+                            ExportList += (int a, XWPFTable Table, List<TableStruct> temp) =>
+                            {
+                                Table.Rows[a + 1].GetCell(tempNum).SetText($"{temp[a].Type}{(temp[a].Length == 0 ? "" : $"({temp[a].Length})")}()");
+                            };
+                        }
+                        if (config.ChsName)
+                        {
+                            var tempNum = titleSum++;
+                            TitleList += (int a, XWPFTable Table, List<TableStruct> temp) =>
+                            {
+                                Table.Rows[0].GetCell(tempNum).SetText("字段中文名");
+                            };
+                            ExportList += (int a, XWPFTable Table, List<TableStruct> temp) =>
+                            {
+                                Table.Rows[a + 1].GetCell(tempNum).SetText(temp[a].ColDes);
+                            };
+                        }
+                        if (config.Required)
+                        {
+                            var tempNum = titleSum++;
+                            TitleList += (int a, XWPFTable Table, List<TableStruct> temp) =>
+                            {
+                                Table.Rows[0].GetCell(tempNum).SetText("是否必填");
+                            };
+                            ExportList += (int a, XWPFTable Table, List<TableStruct> temp) =>
+                            {
+                                Table.Rows[a + 1].GetCell(tempNum).SetText(temp[a].IsNullAble == 1 ? "N" : "Y");
+                            };
+                        }
+                        if (config.DefaultValue)
+                        {
+                            var tempNum = titleSum++;
+                            TitleList += (int a, XWPFTable Table, List<TableStruct> temp) =>
+                            {
+                                Table.Rows[0].GetCell(tempNum).SetText("是否默认值");
+                            };
+                            ExportList += (int a, XWPFTable Table, List<TableStruct> temp) =>
+                            {
+                                Table.Rows[a + 1].GetCell(tempNum).SetText(temp[a].DefaultValue);
+                            };
+                        }
                         foreach (var item in output)
                         {
                             var temp = item.ToList();
@@ -186,25 +262,26 @@ SELECT
                             XWPFRun rUserHead = Paragraph.CreateRun();
                             rUserHead.SetText($"表{item.Key}（）");
                             //rUserHead.AddCarriageReturn();
-                            var Table = doc.CreateTable(item.Count() + 1, properties.Count());
+                            var Table = doc.CreateTable(item.Count() + 1, titleSum);
                             Table.Width = 5000;
 
-                            for (var i = 0; i < properties.Count(); i++)
-                            {
-                                var displayName = properties[i].GetCustomAttribute<DisplayNameAttribute>();
-                                //if (displayName != null)
-                                Table.Rows[0].GetCell(i).SetText(displayName.DisplayName);
-                            }
+                            //for (var i = 0; i < properties.Count(); i++)
+                            //{
+                            //    var displayName = properties[i].GetCustomAttribute<DisplayNameAttribute>();
+                            //    Table.Rows[0].GetCell(i).SetText(displayName.DisplayName);
+                            //}
+                            TitleList(0, Table, temp);
                             for (var i = 0; i < temp.Count; i++)
                             {
-                                Table.Rows[i + 1].GetCell(0).SetText(temp[i].Number.ToString());
-                                Table.Rows[i + 1].GetCell(1).SetText(temp[i].ColName);
-                                Table.Rows[i + 1].GetCell(2).SetText(temp[i].Type);
-                                Table.Rows[i + 1].GetCell(3).SetText(temp[i].ColDes);
-                                Table.Rows[i + 1].GetCell(4).SetText(temp[i].IsNullAble == 1 ? "N" : "Y");
-                                Table.Rows[i + 1].GetCell(5).SetText(temp[i].DefaultValue);
+                                ExportList(i, Table, temp);
+                                //Table.Rows[i + 1].GetCell(0).SetText(temp[i].Number.ToString());
+                                //Table.Rows[i + 1].GetCell(1).SetText(temp[i].ColName);
+                                //Table.Rows[i + 1].GetCell(2).SetText($"{temp[i].Type}{temp[i].Length ?? $"({temp[i].Length})"}()");
+                                //Table.Rows[i + 1].GetCell(3).SetText(temp[i].ColDes);
+                                //Table.Rows[i + 1].GetCell(4).SetText(temp[i].IsNullAble == 1 ? "N" : "Y");
+                                //Table.Rows[i + 1].GetCell(5).SetText(temp[i].DefaultValue);
                             }
-                            for (var i = 0; i < properties.Count(); i++)
+                            for (var i = 0; i < titleSum; i++)
                             {
                                 var tcpr = Table.GetRow(0).GetCell(i).GetCTTc().AddNewTcPr();
                                 tcpr.tcW = new CT_TblWidth();
@@ -215,7 +292,7 @@ SELECT
                         {
                             doc.Write(fs);
                         }
-                        MessageBox.Show("成功导出数据！");
+                        MessageBox.Show("成功导出数据！!");
                     }
                 }
             }
@@ -224,6 +301,28 @@ SELECT
                 MessageBox.Show("错误信息：" + ex.Message, "出现错误");
                 return;
             }
+        }
+
+        /// <summary>
+        /// 转换为下划线
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public string ToDownLine(string input)
+        {
+            var result = "";
+            return result;
+        }
+
+        /// <summary>
+        /// 转换为大驼峰
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public string ToUpper(string input)
+        {
+            var result = "";
+            return result;
         }
 
         public T Change<T>(SqlDataReader reader) where T : new()
@@ -397,6 +496,13 @@ order by D.name"; // 查询语句
                 }
             }
             return strValue;
+        }
+
+        private void 导出配置ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var exportConfig = SingletonHelper<ExportConfig>.CreateInstance();
+            exportConfig.Show();
+            config = JsonHelper.ReadConfigJson();
         }
     }
 }

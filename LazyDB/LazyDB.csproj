@@ -46,6 +46,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Command.cs" />
+    <Compile Include="ExportConfig.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ExportConfig.designer.cs">
+      <DependentUpon>ExportConfig.cs</DependentUpon>
+    </Compile>
     <Compile Include="DBConfig.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -99,6 +105,9 @@
     <Content Include="Resources\Command.png" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ExportConfig.resx">
+      <DependentUpon>ExportConfig.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DBConfig.resx">
       <DependentUpon>DBConfig.cs</DependentUpon>
     </EmbeddedResource>

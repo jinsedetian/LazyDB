@@ -44,17 +44,10 @@ namespace LazyDB
         public static bool WriteFile(string fileContent)
         {
             string FilePath = Application.StartupPath;
-            try
-            {
-                StreamWriter TxtWriter = new StreamWriter(FilePath + "\\SystemConfig.json", false, System.Text.Encoding.UTF8);
-                TxtWriter.Write(fileContent + Environment.NewLine);
-                TxtWriter.Close();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+            StreamWriter TxtWriter = new StreamWriter(FilePath + "\\SystemConfig.json", false, System.Text.Encoding.UTF8);
+            TxtWriter.Write(fileContent + Environment.NewLine);
+            TxtWriter.Close();
+            return true;
         }
     }
     public class ShortDateTimeConverter : DateTimeConverterBase

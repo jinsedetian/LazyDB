@@ -23,7 +23,8 @@ namespace LazyDB
         public string ColDes { get; set; }
         [DisplayName("必填")]
         public int IsNullAble { get; set; }
-
+        [DisplayName("长度")]
+        public int Length { get; set; }
         [DisplayName("默认值")]
         public string DefaultValue { get; set; }
     }

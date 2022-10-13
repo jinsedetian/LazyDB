@@ -11,39 +11,34 @@ using System.Windows.Forms;
 
 namespace LazyDB
 {
-    public partial class DBConfig : Form
+    public partial class ExportConfig : Form
     {
         private SystemConfigModel Config = new SystemConfigModel();
-        public DBConfig()
+        public ExportConfig()
         {
             InitializeComponent();
         }
 
-        public DBConfig(SystemConfigModel config)
+        public ExportConfig(SystemConfigModel config)
         {
             InitializeComponent();
             Config = config;
-            DbIP_TBox.Text = Config.ip;
-            DbName_TBox.Text = Config.dbName;
-            DbUserName_TBox.Text = Config.userName;
-            DbPwd_TBox.Text = Config.password;
-        }
-
-        #region 窗体操作
-        private void DbIP_PBox_Click(object sender, EventArgs e)
-        {
-            DbIP_TBox.Enabled = true;
-            DbIP_TBox.ReadOnly = false;
+            number.Checked = Config.Number;
+            EngName.Checked = Config.EngName == "Normal" ? true : false;
+            Type.Checked = Config.Type;
+            ChsName.Checked = Config.ChsName;
+            Required.Checked = Config.Required;
+            DefaultValue.Checked = Config.DefaultValue;
         }
 
         private void Save_Btn_Click(object sender, EventArgs e)
         {
-            Config.ip = DbIP_TBox.Text;
-            Config.dbName = DbName_TBox.Text;
-            Config.userName = DbUserName_TBox.Text;
-            Config.password = DbPwd_TBox.Text;
-            Config.appId = appidBox.Text;
-            Config.code = codeBox.Text;
+            Config.Number = number.Checked;
+            Config.EngName = EngName.Checked ? "Normal" : "None";
+            Config.Type = Type.Checked;
+            Config.ChsName = ChsName.Checked;
+            Config.Required = Required.Checked;
+            Config.DefaultValue = DefaultValue.Checked;
             try
             {
                 JsonHelper.WriteFile(JsonConvert.SerializeObject(Config, Formatting.Indented));
@@ -55,30 +50,31 @@ namespace LazyDB
                 MessageBox.Show("保存失败\n" + ex.Message);
             }
         }
-        private void DbConfig_FormClosed(object sender, FormClosedEventArgs e)
+        private void ExportConfig_FormClosed(object sender, FormClosedEventArgs e)
         {
-            SingletonHelper<DBConfig>.Dispose();
+            SingletonHelper<ExportConfig>.Dispose();
         }
-        #endregion
 
         #region 保存配置
         private void LoadAppConfig()
         {
-            DbIP_TBox.Text = Config.ip;
-            DbName_TBox.Text = Config.dbName;
-            DbUserName_TBox.Text = Config.userName;
-            DbPwd_TBox.Text = Config.password;
-            appidBox.Text = Config.appId;
-            codeBox.Text = Config.code;
+            number.Checked = Config.Number;
+            EngName.Checked = Config.EngName == "Normal" ? true : false;
+            Type.Checked = Config.Type;
+            ChsName.Checked = Config.ChsName;
+            Required.Checked = Config.Required;
+            DefaultValue.Checked = Config.DefaultValue;
         }
         private bool WriteAppConfig()
         {
             bool b = true;
             Dictionary<string, string> dic = new Dictionary<string, string>();
-            dic.Add("DbIP", DbIP_TBox.Text);
-            dic.Add("DbName", DbName_TBox.Text);
-            dic.Add("DbUserName", DbUserName_TBox.Text);
-            dic.Add("DbPwd", DbPwd_TBox.Text);
+            dic.Add("OrderNo", number.Checked.ToString());
+            dic.Add("EngName", EngName.Checked.ToString());
+            dic.Add("Type", Type.Checked.ToString());
+            dic.Add("ChsName", ChsName.Checked.ToString());
+            dic.Add("Required", Required.Checked.ToString());
+            dic.Add("DefaultValue", DefaultValue.Checked.ToString());
             try
             {
                 Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
@@ -100,7 +96,7 @@ namespace LazyDB
         }
         #endregion
 
-        private void DBConfig_Load(object sender, EventArgs e)
+        private void ExportConfig_Load(object sender, EventArgs e)
         {
             Config = JsonHelper.ReadConfigJson();
             LoadAppConfig();
