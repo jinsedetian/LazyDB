@@ -13,6 +13,7 @@ using System.Net;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
@@ -194,18 +195,63 @@ SELECT
                                 Table.Rows[a + 1].GetCell(tempNum).SetText(temp[a].Number.ToString());
                             };
                         }
-                        if (config.EngName == "Normal")
+                        //英文字段转换
+                        switch (config.EngName)
                         {
-                            var tempNum = titleSum++;
-                            TitleList += (int a, XWPFTable Table, List<TableStruct> temp) =>
-                            {
-                                Table.Rows[0].GetCell(tempNum).SetText("字段英文名");
-                            };
-                            ExportList += (int a, XWPFTable Table, List<TableStruct> temp) =>
-                            {
-                                Table.Rows[a + 1].GetCell(tempNum).SetText(temp[a].ColName);
-                            };
+                            case "Normal":
+                                {
+                                    var tempNum = titleSum++;
+                                    TitleList += (int a, XWPFTable Table, List<TableStruct> temp) =>
+                                    {
+                                        Table.Rows[0].GetCell(tempNum).SetText("字段英文名");
+                                    };
+                                    ExportList += (int a, XWPFTable Table, List<TableStruct> temp) =>
+                                    {
+                                        Table.Rows[a + 1].GetCell(tempNum).SetText(temp[a].ColName);
+                                    };
+                                    break;
+                                }
+                            case "ToDownLine":
+                                {
+                                    var tempNum = titleSum++;
+                                    TitleList += (int a, XWPFTable Table, List<TableStruct> temp) =>
+                                    {
+                                        Table.Rows[0].GetCell(tempNum).SetText("字段英文名");
+                                    };
+                                    ExportList += (int a, XWPFTable Table, List<TableStruct> temp) =>
+                                    {
+                                        Table.Rows[a + 1].GetCell(tempNum).SetText(ToDownLine(temp[a].ColName));
+                                    };
+                                    break;
+                                }
+                            case "ToUpperCamelCase":
+                                {
+                                    var tempNum = titleSum++;
+                                    TitleList += (int a, XWPFTable Table, List<TableStruct> temp) =>
+                                    {
+                                        Table.Rows[0].GetCell(tempNum).SetText("字段英文名");
+                                    };
+                                    ExportList += (int a, XWPFTable Table, List<TableStruct> temp) =>
+                                    {
+                                        Table.Rows[a + 1].GetCell(tempNum).SetText(ToUpperCamelCase(temp[a].ColName));
+                                    };
+                                    break;
+                                }
+                            case "ToLowerCamelCase":
+                                {
+                                    var tempNum = titleSum++;
+                                    TitleList += (int a, XWPFTable Table, List<TableStruct> temp) =>
+                                    {
+                                        Table.Rows[0].GetCell(tempNum).SetText("字段英文名");
+                                    };
+                                    ExportList += (int a, XWPFTable Table, List<TableStruct> temp) =>
+                                    {
+                                        Table.Rows[a + 1].GetCell(tempNum).SetText(ToLowerCamelCase(temp[a].ColName));
+                                    };
+                                    break;
+                                }
                         }
+                        
                         if (config.Type)
                         {
                             var tempNum = titleSum++;
@@ -215,7 +261,7 @@ SELECT
                             };
                             ExportList += (int a, XWPFTable Table, List<TableStruct> temp) =>
                             {
-                                Table.Rows[a + 1].GetCell(tempNum).SetText($"{temp[a].Type}{(temp[a].Length == 0 ? "" : $"({temp[a].Length})")}()");
+                                Table.Rows[a + 1].GetCell(tempNum).SetText($"{temp[a].Type}{(temp[a].Length == 0 ? "" : $"({temp[a].Length})")}");
                             };
                         }
                         if (config.ChsName)
@@ -310,7 +356,9 @@ SELECT
         /// <returns></returns>
         public string ToDownLine(string input)
         {
-            var result = "";
+            var result = Regex.Replace(input, @"(?x)( [A-Z][a-z,0-9]+ | [A-Z]+(?![a-z]))", "_$0").ToUpper();
+            if (result.StartsWith("_"))
+                result = result.Substring(1, result.Length - 1);
             return result;
         }
 
@@ -319,10 +367,41 @@ SELECT
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public string ToUpper(string input)
+        public string ToUpperCamelCase(string input)
         {
-            var result = "";
-            return result;
+            var result = input.Split('_');
+            for (var i = 0; i < result.Length; i++)
+            {
+                if (result[i].Length <= 1)
+                {
+                    result[i] = result[i].ToUpper();
+                }
+                else
+                    result[i] = $"{result[i].Substring(0, 1).ToUpper()}{result[i].Substring(1, result[i].Length - 1).ToLower()}";
+            }
+            return string.Join(null, result);
+        }
+
+        /// <summary>
+        /// 转换为小驼峰
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public string ToLowerCamelCase(string input)
+        {
+            var result = input.Split('_');
+            for (var i = 0; i < result.Length; i++)
+            {
+                if (i == 0)
+                    result[i] = result[i].ToLower();
+                if (result[i].Length <= 1)
+                {
+                    result[i] = result[i].ToUpper();
+                }
+                else
+                    result[i] = $"{result[i].Substring(0, 1).ToUpper()}{result[i].Substring(1, result[i].Length - 1).ToLower()}";
+            }
+            return string.Join(null, result);
         }
 
         public T Change<T>(SqlDataReader reader) where T : new()

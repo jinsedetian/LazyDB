@@ -19,23 +19,6 @@ namespace LazyDB
             InitializeComponent();
         }
 
-        public DBConfig(SystemConfigModel config)
-        {
-            InitializeComponent();
-            Config = config;
-            DbIP_TBox.Text = Config.ip;
-            DbName_TBox.Text = Config.dbName;
-            DbUserName_TBox.Text = Config.userName;
-            DbPwd_TBox.Text = Config.password;
-        }
-
-        #region 窗体操作
-        private void DbIP_PBox_Click(object sender, EventArgs e)
-        {
-            DbIP_TBox.Enabled = true;
-            DbIP_TBox.ReadOnly = false;
-        }
-
         private void Save_Btn_Click(object sender, EventArgs e)
         {
             Config.ip = DbIP_TBox.Text;
@@ -59,9 +42,7 @@ namespace LazyDB
         {
             SingletonHelper<DBConfig>.Dispose();
         }
-        #endregion
 
-        #region 保存配置
         private void LoadAppConfig()
         {
             DbIP_TBox.Text = Config.ip;
@@ -71,34 +52,6 @@ namespace LazyDB
             appidBox.Text = Config.appId;
             codeBox.Text = Config.code;
         }
-        private bool WriteAppConfig()
-        {
-            bool b = true;
-            Dictionary<string, string> dic = new Dictionary<string, string>();
-            dic.Add("DbIP", DbIP_TBox.Text);
-            dic.Add("DbName", DbName_TBox.Text);
-            dic.Add("DbUserName", DbUserName_TBox.Text);
-            dic.Add("DbPwd", DbPwd_TBox.Text);
-            try
-            {
-                Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-                foreach (KeyValuePair<string, string> kv in dic)
-                {
-                    if (config.AppSettings.Settings[kv.Key] == null)
-                        config.AppSettings.Settings.Add(kv.Key, kv.Value);
-                    else
-                        config.AppSettings.Settings[kv.Key].Value = kv.Value;
-                }
-                config.Save(ConfigurationSaveMode.Modified);
-                ConfigurationManager.RefreshSection("appSettings");
-            }
-            catch (Exception ex)
-            {
-                b = false;
-            }
-            return b;
-        }
-        #endregion
 
         private void DBConfig_Load(object sender, EventArgs e)
         {

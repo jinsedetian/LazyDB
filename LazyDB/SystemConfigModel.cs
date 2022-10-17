@@ -23,26 +23,26 @@ namespace LazyDB
         /// <summary>
         /// 序号
         /// </summary>
-        public bool Number { get; set; }
+        public bool Number { get; set; } = true;
         /// <summary>
         /// 字段英文名
         /// </summary>
-        public string EngName { get; set; }
+        public string EngName { get; set; } = "Normal";
         /// <summary>
         /// 类型
         /// </summary>
-        public bool Type { get; set; }
+        public bool Type { get; set; } = true;
         /// <summary>
         /// 字段中文名
         /// </summary>
-        public bool ChsName { get; set; }
+        public bool ChsName { get; set; } = true;
         /// <summary>
         /// 必填
         /// </summary>
-        public bool Required { get; set; }
+        public bool Required { get; set; } = true;
         /// <summary>
         /// 默认值
         /// </summary>
-        public bool DefaultValue { get; set; }
+        public bool DefaultValue { get; set; } = true;
     }
 }

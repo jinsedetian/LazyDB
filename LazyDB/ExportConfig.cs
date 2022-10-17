@@ -19,22 +19,20 @@ namespace LazyDB
             InitializeComponent();
         }
 
-        public ExportConfig(SystemConfigModel config)
-        {
-            InitializeComponent();
-            Config = config;
-            number.Checked = Config.Number;
-            EngName.Checked = Config.EngName == "Normal" ? true : false;
-            Type.Checked = Config.Type;
-            ChsName.Checked = Config.ChsName;
-            Required.Checked = Config.Required;
-            DefaultValue.Checked = Config.DefaultValue;
-        }
-
         private void Save_Btn_Click(object sender, EventArgs e)
         {
             Config.Number = number.Checked;
-            Config.EngName = EngName.Checked ? "Normal" : "None";
+            if (!EngName.Checked)
+                Config.EngName = "None";
+            else
+            {
+                if (EngNameBox.SelectedIndex == 0)
+                    Config.EngName = "ToDownLine";
+                if (EngNameBox.SelectedIndex == 1)
+                    Config.EngName = "ToUpperCamelCase";
+                if (EngNameBox.SelectedIndex == 2)
+                    Config.EngName = "ToLowerCamelCase";
+            }
             Config.Type = Type.Checked;
             Config.ChsName = ChsName.Checked;
             Config.Required = Required.Checked;
@@ -59,40 +57,36 @@ namespace LazyDB
         private void LoadAppConfig()
         {
             number.Checked = Config.Number;
-            EngName.Checked = Config.EngName == "Normal" ? true : false;
+            if (Config.EngName != "None")
+            {
+                EngName.Checked = true;
+                EngNameBox.Enabled = true;
+                var i = 0;
+                switch (Config.EngName)
+                {
+                    case "ToDownLine":
+                        i = 0;
+                        break;
+                    case "ToUpperCamelCase":
+                        i = 0;
+                        break;
+                    case "ToLowerCamelCase":
+                        i = 0;
+                        break;
+                }
+                EngNameBox.SetItemCheckState(i,
+                    System.Windows.Forms.CheckState.Checked);
+            }
+            else
+            {
+                EngName.Checked = false;
+                EngNameBox.Enabled = false;
+            }
+            EngName.Checked = Config.EngName != "None" ? true : false;
             Type.Checked = Config.Type;
             ChsName.Checked = Config.ChsName;
             Required.Checked = Config.Required;
             DefaultValue.Checked = Config.DefaultValue;
-        }
-        private bool WriteAppConfig()
-        {
-            bool b = true;
-            Dictionary<string, string> dic = new Dictionary<string, string>();
-            dic.Add("OrderNo", number.Checked.ToString());
-            dic.Add("EngName", EngName.Checked.ToString());
-            dic.Add("Type", Type.Checked.ToString());
-            dic.Add("ChsName", ChsName.Checked.ToString());
-            dic.Add("Required", Required.Checked.ToString());
-            dic.Add("DefaultValue", DefaultValue.Checked.ToString());
-            try
-            {
-                Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-                foreach (KeyValuePair<string, string> kv in dic)
-                {
-                    if (config.AppSettings.Settings[kv.Key] == null)
-                        config.AppSettings.Settings.Add(kv.Key, kv.Value);
-                    else
-                        config.AppSettings.Settings[kv.Key].Value = kv.Value;
-                }
-                config.Save(ConfigurationSaveMode.Modified);
-                ConfigurationManager.RefreshSection("appSettings");
-            }
-            catch (Exception ex)
-            {
-                b = false;
-            }
-            return b;
         }
         #endregion
 
@@ -100,6 +94,33 @@ namespace LazyDB
         {
             Config = JsonHelper.ReadConfigJson();
             LoadAppConfig();
+        }
+
+        private void EngName_CheckedChanged(object sender, EventArgs e)
+        {
+            if (EngName.Checked)
+                EngNameBox.Enabled = true;
+            else
+            {
+                EngNameBox.Enabled = false;
+                for (int i = 0; i < EngNameBox.Items.Count; i++)
+                {
+                    this.EngNameBox.SetItemCheckState(i,
+                        System.Windows.Forms.CheckState.Unchecked);
+                }
+            }
+        }
+
+        private void EngNameBox_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            for (int i = 0; i < EngNameBox.Items.Count; i++)
+            {
+                if (i != e.Index)
+                {
+                    this.EngNameBox.SetItemCheckState(i,
+                    System.Windows.Forms.CheckState.Unchecked);
+                }
+            }
         }
     }
 }
